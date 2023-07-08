@@ -1,9 +1,7 @@
 const Card = require('../models/card');
-const { OK } = require('../errors/errors');
-const { CREATED } = require('../errors/errors');
-const { BAD_REQUEST } = require('../errors/errors');
-const { NOT_FOUND } = require('../errors/errors');
-const { INTERNAL_SERVER_ERROR } = require('../errors/errors');
+const {
+  OK, CREATED, BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR,
+} = require('../errors/errors');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
