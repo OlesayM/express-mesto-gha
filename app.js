@@ -24,10 +24,10 @@ app.use(express.json());
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-// app.use('/*', (req, res) => {
-//   res.status(NOT_FOUND)
-//     .send({ message: 'NOT_FOUND: Страница не найдена.' }); // В случае не корректного вода адреса
-// });
+app.use('/*', (req, res) => {
+  res.status(NOT_FOUND)
+    .send({ message: 'NOT_FOUND: Страница не найдена.' }); // В случае не корректного вода адреса
+});
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
