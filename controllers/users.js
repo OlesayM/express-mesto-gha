@@ -10,14 +10,15 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params.userId)
+  User
+    .findById(req.params.userId)
     .orFail()
     .then((user) => res.status(OK).send(user))
     .catch((err) => {
-      if (err.name === 'IncorrectDataError') {
+      if (err.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при выводе пользователя' });
       }
-      if (err.name === 'UserNotFound') {
+      if (err.name === 'DocumentNotFoundError') {
         return res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
       }
       return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
