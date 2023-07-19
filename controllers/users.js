@@ -62,17 +62,24 @@ module.exports.createUser = (req, res, next) => {
     });
 };
 
+// module.exports.getCurrentUser = (req, res, next) => {
+//   User.findById(req.user._id)
+//     .then((user) => {
+//       if (!user) {
+//         throw new ErrNotFound('Пользователь не найден');
+//       }
+//       res.send({ data: user });
+//     })
+//     .catch((err) => next(err));
+// };
 module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
-    .then((user) => {
-      if (!user) {
-        throw new ErrNotFound('Пользователь не найден');
-      }
-      res.send({ data: user });
+    .orFail(() => {
+      throw new ErrNotFound('Пользователь не найден');
     })
-    .catch((err) => next(err));
+    .then((user) => res.send(user))
+    .catch(next);
 };
-
 module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
