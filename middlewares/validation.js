@@ -1,19 +1,11 @@
 const { celebrate, Joi } = require('celebrate');
-const validator = require('validator');
 
-const checkUrl = Joi.string().custom((value, helper) => {
-  if (validator.isURL(value)) {
-    return value;
-  }
-  return helper.message('Неправильный формат ссылки');
-});
-
-const checkEmail = Joi.string().required().email();
+const regex = /((http|ftp|https):\/\/)?(([\w.-]*)\.([\w]*))/;
 
 const checkCreateCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: checkUrl,
+    link: Joi.string().pattern(regex).required(),
   }),
 });
 
@@ -27,15 +19,15 @@ const checkCreateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: checkUrl,
-    email: checkEmail,
+    avatar: Joi.string().pattern(regex).required(),
+    email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }),
 });
 
 const checkLogin = celebrate({
   body: Joi.object().keys({
-    email: checkEmail,
+    email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }),
 });
@@ -49,7 +41,7 @@ const checkProfile = celebrate({
 
 const checkAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: checkUrl,
+    avatar: Joi.string().pattern(regex).required(),
   }),
 });
 
