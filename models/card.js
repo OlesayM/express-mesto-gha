@@ -12,10 +12,9 @@ const cardSchema = new mongoose.Schema(
     link: {
       type: String,
       required: true,
-      // validate: {
-      //   validator: (url) => validator.isURL(url),
-      //   message: 'Неправильно заполнено поле, укажите URL',
-      // },
+      validate(value) {
+        return /[-a-zA-Z0-9@:%_+.~#?&/=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&/=]*)?/gi.test(value);
+      },
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
