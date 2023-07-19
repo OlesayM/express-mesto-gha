@@ -1,16 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { NOT_FOUND } = require('./errors/errors');
+const { errors } = require('celebrate');
+const auth = require('./middlewares/auth');
+const validation = require('./middlewares/validation');
+const { login, createUser } = require('./controllers/users');
+const middlewares = require('./middlewares/middlewares');
+const ErrNotFound = require('./errors/ErrNotFound'); // 404
 
 const { PORT = 3000 } = process.env;
 const app = express();
-// добавляет в каждый запрос объект user
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64a71a11e0dcdb4c4a2dbff5',
-  };
-  next();
-});
 
 mongoose
   .connect('mongodb://127.0.0.1:27017/mestodb')
@@ -21,13 +19,19 @@ mongoose
     console.log('Не удалось подключиться к Базе данных');
   });
 app.use(express.json());
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+// app.use(auth);
 
-app.use('/*', (req, res) => {
-  res.status(NOT_FOUND)
-    .send({ message: 'NOT_FOUND: Страница не найдена.' }); // В случае не корректного вода адреса
+app.post('/signin', validation.checkLogin, login);
+app.post('/signup', validation.checkCreateUser, createUser);
+
+app.use('/users', auth, require('./routes/users'));
+app.use('/cards', auth, require('./routes/cards'));
+
+app.use((req, res, next) => {
+  next(new ErrNotFound('Страница не найдена'));
 });
+app.use(errors());
+app.use(middlewares);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
