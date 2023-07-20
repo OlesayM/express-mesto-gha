@@ -42,6 +42,23 @@ module.exports.deleteCard = (req, res, next) => {
       next(err);
     });
 };
+module.exports.deleteCard = (req, res, next) => {
+  Card.findById(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        throw new ErrNotFound('Карточка не найдена');
+      }
+      if (String(card.owner) !== String(req.user._id)) {
+        throw new ErrForbidden('Нет прав на удаление');
+      }
+      // console.log(req.params.cardId);
+      return Card.findByIdAndRemove(req.params.cardId);
+    })
+    .then((card) => res.status(200).send({ data: card }))
+    .catch((err) => {
+      next(err);
+    });
+};
 
 module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
