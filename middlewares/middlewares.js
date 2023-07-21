@@ -1,9 +1,12 @@
 const middlewares = (err, req, res, next) => {
-  const status = err.statusCode || 500;
-  res.status(status).send({
-    err,
-    message: err.message,
-  });
+  const { statusCode, message } = err;
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
   next();
 };
 

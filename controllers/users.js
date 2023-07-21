@@ -33,6 +33,21 @@ module.exports.getUsersId = (req, res, next) => {
     });
 };
 
+// module.exports.getCurrentUser = (req, res, next) => {
+//   User.findById(req.user._id)
+//     .orFail(() => {
+//       throw new ErrNotFound('Пользователь не найден');
+//     })
+//     .then((user) => res.status(200).send({ user }))
+//     .catch((err) => {
+//       if (err.name === 'CastError') {
+//         throw new ErrBadRequest('Переданы некорректные данные');
+//       } else if (err.message === 'NotFound') {
+//         throw new ErrNotFound('Пользователь не найден');
+//       }
+//     })
+//     .catch(next);
+// };
 module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(() => {
@@ -40,23 +55,13 @@ module.exports.getCurrentUser = (req, res, next) => {
     })
     .then((user) => res.status(200).send({ user }))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new ErrBadRequest('Переданы некорректные данные');
-      } else if (err.message === 'NotFound') {
-        throw new ErrNotFound('Пользователь не найден');
-      }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-
-  if (!email || !password) {
-    throw new ErrBadRequest('Неправильный email или пароль');
-  }
-
   User.findOne({ email })
     .then((user) => {
       if (user) {
